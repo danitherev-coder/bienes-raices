@@ -4,25 +4,68 @@ import { unlink } from 'node:fs/promises'
 
 
 const admin = async (req, res) => {
-    const { id } = req.usuario
-    console.log(id);
 
-    const propiedades = await Propiedad.findAll({
-        where: {
-            usuarioID: id
-        },
-        // estamos haciendo un join en una base de datos, en sequelize se hace asi sencillo
-        include: [
-            { model: Categoria, as: 'categoria' },
-            { model: Precio, as: 'precio' }
-        ]
-    })
+    // PAGINACION DE LAS PROPIEDADES
+    const { pagina: paginaActual } = req.query
+    const expresionRegular = /^[1-9]$/
 
-    res.render('propiedades/admin', {
-        pagina: 'Mis propiedades',
-        csrfToken: req.csrfToken(),
-        propiedades
-    })
+    if (!expresionRegular.test(paginaActual)) {
+        return res.redirect('/mis-propiedades?pagina=1')
+    }
+
+    try {
+        const { id } = req.usuario
+        console.log(id);
+
+        // LIMITES Y OFFSET PARA EL PAGINADOR
+        const limit = 3
+        const offset = ((paginaActual * limit) - limit)
+
+
+
+        const [propiedades, total] = await Promise.all([
+            Propiedad.findAll({
+                limit,
+                offset,
+                where: {
+                    usuarioID: id
+                },
+                // estamos haciendo un join en una base de datos, en sequelize se hace asi sencillo
+                include: [
+                    { model: Categoria, as: 'categoria' },
+                    { model: Precio, as: 'precio' }
+                ],
+                order: [
+                    ['createdAt', 'DESC']
+                ]
+            }),
+            Propiedad.count({
+                where: {
+                    usuarioID: id
+                }
+            })
+        ])
+
+
+
+        console.log(total);
+
+
+        res.render('propiedades/admin', {
+            pagina: 'Mis propiedades',
+            csrfToken: req.csrfToken(),
+            propiedades,
+            paginas: Math.ceil(total / limit),
+            paginaActual: Number(paginaActual),
+            total,
+            offset,
+            limit
+        })
+    } catch (error) {
+        console.log(error);
+    }
+
+
 }
 //formulario para crerar una nueva propeidad
 const crear = async (req, res) => {
