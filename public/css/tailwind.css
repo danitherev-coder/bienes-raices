@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.leaflet-container a {
+    color: white;
+    background-color: rgb(79 70 229);
+}

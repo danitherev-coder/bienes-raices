@@ -4,6 +4,8 @@ import csrf from 'csurf'
 import cookieParser from 'cookie-parser'
 import usuarioRoutes from './routes/userRoutes.js'
 import propiedadesRoutes from './routes/propiedadesRoutes.js'
+import appRoutes from './routes/appRoutes.js'
+import apiRoutes from './routes/apiRoutes.js'
 import db from './config/db.js'
 
 // Creando la App
@@ -35,11 +37,11 @@ app.use(express.static('public'))
 
 
 // Routing
+app.use('/', appRoutes)
 // app.get('/auth', usuarioRoutes) //Este GET sirve para que BUSQUE UNA SOLA VEZ Y ESPECIFICAMENTE LA RUTA / 
 app.use('/auth', usuarioRoutes) // este USE busca TODAS LAS RUTAS QUE EMPIEZEN POR / asi que si nosotros ponemos en el navegador /nosotros, lo encuentra, pero si usamos solo GET no, porque solo definimos el / y solo eso busca.
 app.use('/', propiedadesRoutes)
-
-
+app.use('/api', apiRoutes)
 //Definir un puerto y arrancar el proyecto
 const port = 3000;
 
