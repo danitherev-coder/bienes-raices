@@ -3,14 +3,14 @@ import dotenv from 'dotenv'
 dotenv.config()
 //vamos a tener 2 email, uno para confirmar cuenta y otro cuando al usuario se le olvide su password
 const emailRegistro = async (datos) => {
-    const transport = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
+    var transport = nodemailer.createTransport({
+        host: "smtp.mailtrap.io",
+        port: 2525,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+          user: "4e22e79eb5c585",
+          pass: "47b1d3a87e4b43"
         }
-    });
+      });
 
     const { nombre, email, token } = datos;
     //ENVIAR EL EMAIL, para eso usamos el transport que sirve para tener acceso a la funcion de sendMail
@@ -28,14 +28,14 @@ const emailRegistro = async (datos) => {
 }
 
 const emailOlvidePassword = async (datos) => {
-    const transport = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
+    var transport = nodemailer.createTransport({
+        host: "smtp.mailtrap.io",
+        port: 2525,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+          user: "4e22e79eb5c585",
+          pass: "47b1d3a87e4b43"
         }
-    });
+      });
 
     const { nombre, email, token } = datos;
     //ENVIAR EL EMAIL, para eso usamos el transport que sirve para tener acceso a la funcion de sendMail

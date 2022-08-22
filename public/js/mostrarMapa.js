@@ -16,7 +16,7 @@
   \*******************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n(function () {\n    const lat = document.querySelector('#lat').textContent\n    const lng = document.querySelector('#lng').textContent\n    const titulo = document.querySelector('#titulo').textContent\n    const mapa = L.map('mapa').setView([lat, lng], 16)\n\n    L.tileLayer('https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {\n        attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'\n    }).addTo(mapa);\n\n    // agregar el ping\n    L.marker([lat, lng])\n        .addTo(mapa)\n        .bindPopup(titulo)\n})()\n\n//# sourceURL=webpack://bienesraices_mvc/./src/js/mostrarMapa.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n(function () {\r\n    const lat = document.querySelector('#lat').textContent\r\n    const lng = document.querySelector('#lng').textContent\r\n    const titulo = document.querySelector('#titulo').textContent\r\n    const mapa = L.map('mapa').setView([lat, lng], 16)\r\n\r\n    L.tileLayer('https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {\r\n        attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'\r\n    }).addTo(mapa);\r\n\r\n    // agregar el ping\r\n    L.marker([lat, lng])\r\n        .addTo(mapa)\r\n        .bindPopup(titulo)\r\n})()\n\n//# sourceURL=webpack://bienesraices_mvc/./src/js/mostrarMapa.js?");
 
 /***/ })
 
