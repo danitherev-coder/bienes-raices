@@ -80,7 +80,7 @@ const buscador = async (req, res) => {
 
     // validar que el termino no este vacio
     if (!termino.trim()) {
-        return res.redirect("javascript: history.go(-1)")
+        return res.redirect("back")
     }
 
     // consultar las propiedades
@@ -88,7 +88,7 @@ const buscador = async (req, res) => {
         where: {
             titulo: {
                 [Sequelize.Op.like]: '%' + termino + '%'
-            }
+            },
         },
         include: [
             { model: Precio, as: 'precio' }

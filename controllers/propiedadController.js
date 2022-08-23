@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator'
-import { Precio, Categoria, Propiedad } from '../models/index.js'
+import { Precio, Categoria, Propiedad, Mensaje, Usuario } from '../models/index.js'
 import { unlink } from 'node:fs/promises'
+import { esVendedor, formatearFecha } from '../helpers/index.js'
 
 
 const admin = async (req, res) => {
@@ -33,7 +34,8 @@ const admin = async (req, res) => {
                 // estamos haciendo un join en una base de datos, en sequelize se hace asi sencillo
                 include: [
                     { model: Categoria, as: 'categoria' },
-                    { model: Precio, as: 'precio' }
+                    { model: Precio, as: 'precio' },
+                    { model: Mensaje, as: 'mensajes' }
                 ],
                 order: [
                     ['createdAt', 'DESC']
@@ -301,6 +303,30 @@ const eliminar = async (req, res) => {
 const mostrarPropiedad = async (req, res) => {
 
     const { id } = req.params
+    // comprobar que la propiedad exista
+    const propiedad = await Propiedad.findByPk(id, {
+        include: [
+            { model: Categoria, as: 'categoria' },
+            { model: Precio, as: 'precio' }
+        ]
+    })
+    if (!propiedad) {
+        return res.redirect('/404')
+    }
+
+    //console.log(esVendedor(req.usuario?.id, propiedad.usuarioID));// estamos pasando el usuario propietario y el usuario que visita la pagina
+
+    res.render('propiedades/mostrar', {
+        propiedad,
+        pagina: propiedad.titulo,
+        csrfToken: req.csrfToken(),
+        usuario: req.usuario,
+        esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioID)
+    })
+}
+
+const enviarMensaje = async (req, res) => {
+    const { id } = req.params
 
     // comprobar que la propiedad exista
     const propiedad = await Propiedad.findByPk(id, {
@@ -313,13 +339,76 @@ const mostrarPropiedad = async (req, res) => {
         return res.redirect('/404')
     }
 
+
+    // renderizar la vista de mensaje por si hay errores
+    let resultado = validationResult(req)
+
+    if (!resultado.isEmpty()) {
+        return res.render('propiedades/mostrar', {
+            propiedad,
+            pagina: propiedad.titulo,
+            csrfToken: req.csrfToken(),
+            usuario: req.usuario,
+            esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioID),
+            errores: resultado.array()
+        })
+    }
+
+    const { mensaje } = req.body
+    const { id: propiedadID } = req.params
+    const { id: usuarioID } = req.usuario
+
+    //ALMACENAR EL MENSAJE, QUIEN LO ENVIO Y EL CONTENIDO DEL MENSAJE
+    await Mensaje.create({
+        mensaje,
+        propiedadID,
+        usuarioID
+
+    })
+
     res.render('propiedades/mostrar', {
         propiedad,
         pagina: propiedad.titulo,
-        csrfToken: req.csrfToken()
+        csrfToken: req.csrfToken(),
+        usuario: req.usuario,
+        esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioID),
+        enviado: true
+    })
+
+    // res.redirect(`/propiedad/${propiedad.id}`)
+}
+
+// leer mensaje recividos
+const verMensajes = async (req, res) => {
+    const { id } = req.params
+    const propiedad = await Propiedad.findByPk(id, {
+        include: [
+            {
+                model: Mensaje, as: 'mensajes',
+                include: [
+                    { model: Usuario.scope('eliminarPassword'), as: 'usuario' }
+                ]
+            },
+        ],
+    })
+    if (!propiedad) {
+        return res.redirect('/mis-propiedades')
+    }
+
+    // Validar que la propiedad pertenece a quien visita la pagina
+    if (propiedad.usuarioID.toString() !== req.usuario.id.toString()) {
+        return res.redirect('/mis-propiedades')
+    }
+
+
+    res.render('propiedades/mensajes', {
+        pagina: 'Mensajes',
+        mensajes: propiedad.mensajes,
+        formatearFecha
     })
 }
 
+
 export {
-    admin, crear, guardar, agregarImagen, almacenarImagen, editar, guardarCambios, eliminar, mostrarPropiedad
+    admin, crear, guardar, agregarImagen, almacenarImagen, editar, guardarCambios, eliminar, mostrarPropiedad, enviarMensaje, verMensajes
 }

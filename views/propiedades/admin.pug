@@ -32,6 +32,8 @@ block contenido
                                             </svg>
                                         = propiedad.precio.nombre
 
+                                    a(href=`/mensajes/${propiedad.id}` class="text-md text-gray-600")= `${propiedad.mensajes.length} Mensajes` 
+
 
                                 div(class="sm:w-1/4 md:w-2/6 lg:w-1/6 flex flex-col lg:flex-row gap-2")
                                     form(action="" method="")
