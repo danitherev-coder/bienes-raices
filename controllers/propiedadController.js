@@ -297,6 +297,34 @@ const eliminar = async (req, res) => {
     res.redirect('/mis-propiedades')
 }
 
+// CAMBIAR EL ESTADO DE LA PROPIEDAD
+const cambiarEstado = async (req, res) => {
+    const { id } = req.params
+    const propiedad = await Propiedad.findByPk(id)
+    if (!propiedad) {
+        return res.redirect('/mis-propiedades')
+    }
+
+    // Validar que la propiedad pertenece a quien visita la pagina
+    if (propiedad.usuarioID.toString() !== req.usuario.id.toString()) {
+        return res.redirect('/mis-propiedades')
+    }
+
+    // actualizar la propiedad
+
+    // if (propiedad.publicado) {
+    //     propiedad.publicado = 0
+    // } else {
+    //     propiedad.publicado = 1
+    // }
+
+    propiedad.publicado = !propiedad.publicado
+    await propiedad.save()
+    res.json({
+        resultado: true
+    })
+}
+
 
 // MOSTRANDO LAS PROPIEDADES PARA EL PUBLICO
 
@@ -310,7 +338,7 @@ const mostrarPropiedad = async (req, res) => {
             { model: Precio, as: 'precio' }
         ]
     })
-    if (!propiedad) {
+    if (!propiedad || !propiedad.publicado) {
         return res.redirect('/404')
     }
 
@@ -410,5 +438,5 @@ const verMensajes = async (req, res) => {
 
 
 export {
-    admin, crear, guardar, agregarImagen, almacenarImagen, editar, guardarCambios, eliminar, mostrarPropiedad, enviarMensaje, verMensajes
+    admin, crear, guardar, agregarImagen, almacenarImagen, editar, guardarCambios, eliminar, cambiarEstado, mostrarPropiedad, enviarMensaje, verMensajes
 }
